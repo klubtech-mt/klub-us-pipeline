@@ -1,0 +1,4 @@
+{
+  "build_command": "pip install -r requirements.txt",
+  "start_command": "python 20250528_us_tracker_server_v6.py"
+}

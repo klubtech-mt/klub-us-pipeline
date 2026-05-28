@@ -1,0 +1,9 @@
+flask
+pillow
+schedule
+pytz
+requests
+anthropic
+
+
+
