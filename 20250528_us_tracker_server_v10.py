@@ -197,15 +197,7 @@ def find_row(company):
     return None
 
 def do_send_vip(company, region):
-    """背景執行緒：等發信時段後發信"""
-    wait_count = 0
-    while not in_send_window():
-        time.sleep(60)
-        wait_count += 1
-        if wait_count > 1440:
-            logging.warning(f"VIP {company} waited 24h, giving up")
-            return
-
+    """背景執行緒：主管核准後立即發信給客戶"""
     row = find_row(company)
     if not row:
         logging.error(f"Company not found in CSV: {company}")
@@ -286,8 +278,8 @@ def approve():
 <body style="margin:0;padding:40px;background:#f4f4f4;font-family:Arial,sans-serif;text-align:center;">
 <div style="background:#27ae60;color:#fff;padding:30px 40px;border-radius:8px;max-width:420px;margin:0 auto;">
   <div style="font-size:48px;margin-bottom:12px;">✓</div>
-  <h2 style="margin:0 0 10px;">已確認發送</h2>
-  <p style="margin:0;opacity:0.9;">{company} 的開發信已記錄，將在發信時段（台灣時間 20:00–23:00）發出。</p>
+  <h2 style="margin:0 0 10px;">已轉發給客戶</h2>
+  <p style="margin:0;opacity:0.9;">{company} 的開發信已核准，正在立即發送給客戶。</p>
 </div>
 </body></html>"""
 
