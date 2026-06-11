@@ -171,43 +171,20 @@ def detect_product(industry):
     return "both"
 
 # ── Image banner ─────────────────────────────────────────────
-def banner(product):
+def banner(product, label, text):
     h3 = "font-size:11px;font-weight:400;letter-spacing:2px;color:#1a1a1a;margin:0 0 8px;text-transform:uppercase;font-family:Georgia,serif"
     ps = "font-size:13px;color:#555;line-height:1.7;margin:0;font-family:Georgia,serif"
     wrap = "margin:24px 0 0;padding-top:20px;border-top:1px solid #ece8e0"
     img_s = "border-radius:6px;border:0;display:block"
     td_i = "padding-right:16px;vertical-align:middle;width:160px"
     td_t = "vertical-align:middle"
-    if product == "raw":
-        return (f'<div style="{wrap}"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
-                f'<td style="{td_i}"><img src="{IMG_R}" width="160" style="{img_s}" alt="Tea"></td>'
-                f'<td style="{td_t}"><h3 style="{h3}">Featured Products</h3>'
-                f'<p style="{ps}">Premium tea &amp; herbal ingredients — sourced from 30+ origins with consistent quality and flexible MOQ.</p></td>'
-                f'</tr></table></div>')
-    elif product == "machinery":
-        return (f'<div style="{wrap}"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
-                f'<td style="{td_i}"><img src="{IMG_M}" width="160" style="{img_s}" alt="Machine"></td>'
-                f'<td style="{td_t}"><h3 style="{h3}">Featured Equipment</h3>'
-                f'<p style="{ps}">Tea&amp;Espresso Two Group Head Machine — commercial brewing designed for high-volume operations.</p></td>'
-                f'</tr></table></div>')
-    else:
-        td1 = "width:50%;padding-right:12px;vertical-align:top"
-        td2 = "width:50%;padding-left:12px;border-left:1px solid #ece8e0;vertical-align:top"
-        ti  = "padding-right:12px;vertical-align:middle;width:80px"
-        tt  = "vertical-align:middle"
-        h2  = "font-size:10px;font-weight:400;letter-spacing:2px;color:#1a1a1a;margin:0 0 6px;text-transform:uppercase;font-family:Georgia,serif"
-        p2  = "font-size:12px;color:#555;line-height:1.6;margin:0;font-family:Georgia,serif"
-        imgs= "border-radius:4px;border:0;display:block"
-        return (f'<div style="{wrap}"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
-                f'<td style="{td1}"><table cellpadding="0" cellspacing="0" border="0"><tr>'
-                f'<td style="{ti}"><img src="{IMG_R}" width="80" style="{imgs}" alt="Tea"></td>'
-                f'<td style="{tt}"><h3 style="{h2}">Tea &amp; Herbal</h3><p style="{p2}">Premium ingredients from 30+ origins.</p></td>'
-                f'</tr></table></td>'
-                f'<td style="{td2}"><table cellpadding="0" cellspacing="0" border="0"><tr>'
-                f'<td style="{ti}"><img src="{IMG_M}" width="80" style="{imgs}" alt="Machine"></td>'
-                f'<td style="{tt}"><h3 style="{h2}">Equipment</h3><p style="{p2}">Tea&amp;Espresso Two Group Head Machine.</p></td>'
-                f'</tr></table></td>'
-                f'</tr></table></div>')
+    img = IMG_M if product == "machinery" else IMG_R
+    alt = "Machine" if product == "machinery" else "Tea"
+    return (f'<div style="{wrap}"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
+            f'<td style="{td_i}"><img src="{img}" width="160" style="{img_s}" alt="{alt}"></td>'
+            f'<td style="{td_t}"><h3 style="{h3}">{label}</h3>'
+            f'<p style="{ps}">{text}</p></td>'
+            f'</tr></table></div>')
 
 # ── Signature ────────────────────────────────────────────────
 def sig(sender):
@@ -217,7 +194,7 @@ def sig(sender):
             f'Frastea Co. Ltd.<br>'
             f'Email./ <span style="font-family:monospace">{sender}</span><br>'
             f'Tel./ +886 963 710 172<br>'
-            f'Web./ <a href="https://www.frastea.com" style="color:#c9b97a;text-decoration:none">www.frastea.com</a><br>'
+            f'Web./ <a href="https://www.frastea.com/en/" style="color:#c9b97a;text-decoration:none">www.frastea.com/en</a><br>'
             f'Add./ 8F, No. 190, Ln. 461, Zhongfeng Rd., Longtan Dist., Taoyuan City 25025, Taiwan (R.O.C.)'
             f'</div>')
 
@@ -236,63 +213,100 @@ def build_email(row):
     product = detect_product(row.get("industry", ""))
     tid     = str(uuid.uuid4())
     pixel   = pixel_html(tid, row["email"], tier)
-    p  = "font-size:14px;line-height:1.9;color:#333;margin:0 0 14px;font-family:Georgia,serif"
-    pl = "font-size:14px;line-height:1.9;color:#333;margin:0;font-family:Georgia,serif"
-    b  = banner(product)
-    s  = sig(sender)
+    p   = "font-size:14px;line-height:1.9;color:#333;margin:0 0 14px;font-family:Georgia,serif"
+    pl  = "font-size:14px;line-height:1.9;color:#333;margin:0;font-family:Georgia,serif"
+    hk  = "font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 14px;line-height:1.5;font-family:Georgia,serif"
+    ac  = "color:#c9b97a"
+    cta = "display:inline-block;margin-top:14px;background:#1a1a1a;color:#c9b97a;padding:9px 20px;border-radius:3px;font-size:13px;font-weight:700;text-decoration:none;font-family:Georgia,serif"
+    s   = sig(sender)
 
     if tier == "VIP":
         if product == "raw":
-            subject = f"Tea & herbal supply for {company}"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>Running multiple locations means ingredient consistency is everything — one off-batch and it shows across the board.</p>"
-                    f"<p style='{p}'>We're Frastea, and we supply premium tea leaves and herbal ingredients to multi-location beverage chains across the US.</p>"
-                    f"<p style='{p}'>A few groups your size have made the switch and haven't looked back.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "Is your customer actually drinking tea — or artificial flavoring?"
+            b = banner("raw", "Featured Products",
+                       "Rapid-extract tea &amp; herbal ingredients — zero artificial flavoring, zero additives. Catechin release increased 300%. Commercially scalable with consistent quality batch after batch.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>What your customers order as 'tea' <span style='{ac}'>might be little more than flavored water.</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>More than 80% of commercial tea chains use artificial flavoring or flavor sprays to maintain taste consistency. Customers believe they're drinking real tea — what they're actually consuming is an artificial imitation, not real tea.</p>"
+                    f"<p style='{p}'>That gap is quietly becoming the reason health-conscious customers don't come back.</p>"
+                    f"<p style='{p}'>Frastea's proprietary <strong>Rapid Cell-Break Extraction</strong> process completes full extraction in 5 seconds — <strong>releasing 300% more catechins, preserving 80%+ of natural flavor, zero additives, zero artificial flavoring</strong>. These aren't marketing claims; they're verified, measurable process results.</p>"
+                    f"<p style='{p}'>We currently work with multi-location beverage chains across the US, helping them turn \"healthy\" from a tagline into a real, tangible difference customers can taste.</p>"
+                    f"<p style='{pl}'>Looking forward to connecting with you.</p>"
+                    f"<a href='https://wa.me/886903150353' style='{cta}'>Request a Free Sample →</a>"
                     f"{b}{s}{pixel}</div>")
         elif product == "machinery":
-            subject = "Brewing equipment built for your operations"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>When equipment goes down at one of your locations, it's not just that store that feels it.</p>"
-                    f"<p style='{p}'>KLUB Technology builds commercial brewing machines for high-volume chains — designed for reliability and easy to standardize across locations.</p>"
-                    f"<p style='{p}'>Happy to share what that looks like in practice.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "60 seconds vs. 15 minutes of steeping — same depth, far cleaner"
+            b = banner("machinery", "Featured Equipment",
+                       "Teapresso Two Group Head Machine — engineered for high-volume commercial operations. Rapid-extract standard built in. Consistent output across every location.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>What traditional steeping takes 15 minutes to develop, <span style='{ac}'>our process delivers in 60 seconds — and better.</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>Most commercial tea brands run into the same wall: <strong>inconsistent hand-brewing, high-temperature steeping that degrades tea polyphenols, and noticeable flavor variation batch to batch.</strong> The larger the operation, the harder it gets to manage.</p>"
+                    f"<p style='{p}'>Frastea developed the <strong>Teapresso Machine</strong> process through deep investment in equipment R&amp;D:</p>"
+                    f"<p style='{p}'>✦ Full extraction completed in 60 seconds<br>✦ Catechin release +300%, reducing sugars +325%<br>✦ Consistent quality across every batch and every location — minimal manual dependency</p>"
+                    f"<p style='{p}'>More importantly — <strong>this process can become your brand's proprietary formula</strong>. Blending ratios, extraction parameters, fully customized end to end. Your competitors cannot replicate it.</p>"
+                    f"<p style='{pl}'>I'd be happy to send samples for your R&amp;D or procurement team to evaluate — no pressure, no commitment required.</p>"
+                    f"<a href='https://wa.me/886963710172' style='{cta}'>Request a Technical Brief + Sample →</a>"
                     f"{b}{s}{pixel}</div>")
         else:
-            subject = "One partner for ingredients & equipment"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>Most chains in your company size are managing separate vendors for ingredients and equipment — which works, until it doesn't.</p>"
-                    f"<p style='{p}'>Frastea and KLUB Technology are sister companies offering premium tea &amp; herbal ingredients alongside the commercial brewing machines to brew them right.</p>"
-                    f"<p style='{p}'>One partner, end to end.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "Your signature tea should be impossible for competitors to copy — it starts with the blend"
+            b = banner("raw", "Tea &amp; Herbal / Equipment",
+                       "Ingredients: reliable and trusted sourced, custom blending, ODM private label available.&nbsp; Equipment: Teapresso Two Group Head Machine, fully integrated with rapid-extract production.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>When every competitor sources from the same suppliers, <span style='{ac}'>what gives your signature tea a reason to be irreplaceable?</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>Once a chain brand scales up, ingredient commoditization becomes the hardest ceiling to break. Same tea, same formula — and consumers genuinely cannot tell you apart from the shop next door.</p>"
+                    f"<p style='{p}'>Frastea doesn't just supply ingredients. We provide a <strong>Custom Blending × Teapresso Machine</strong> integrated service:</p>"
+                    f"<p style='{p}'>✦ Reliable and trusted sourced tea leaves and herbal ingredients<br>✦ A proprietary blend designed specifically around your brand identity<br>✦ Mass-produced via rapid-extract process — consistent, fully traceable, batch after batch<br>✦ ODM private label available — your formula becomes your brand's competitive advantage</p>"
+                    f"<p style='{p}'>One of our chain brand clients used a custom blend to grow their repeat purchase rate by over 40% within 6 months.</p>"
+                    f"<p style='{pl}'>Would you be interested in designing a formula that belongs exclusively to {company}?</p>"
+                    f"<a href='https://wa.me/886903150353' style='{cta}'>Schedule a Demo + Tea Sample →</a>"
                     f"{b}{s}{pixel}</div>")
     else:
         if product == "raw":
-            subject = f"Free sample, tea & herbal ingredients for {company}"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>We supply premium tea leaves and herbal ingredients to cafes and beverage shops across the US.</p>"
-                    f"<p style='{p}'>If you're ever looking for a reliable source or just want to try something new on your menu, we'd love to send over a sample. No commitment.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "One free tea sample — let your customers taste what real tea should be"
+            b = banner("raw", "Featured Products",
+                       "Rapid-extract tea &amp; herbal ingredients — zero artificial flavoring, zero additives. Catechin release increased 300%. Flexible MOQ, suitable for any operation size.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>That \"jasmine green tea\" on your menu — <span style='{ac}'>how much of it is actually tea?</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>Under the clean-label movement, \"no additives\" and \"natural ingredients\" have become the leading criteria for US consumers choosing what to drink. Yet most commercial tea ingredients still rely on artificial flavoring to deliver consistent taste.</p>"
+                    f"<p style='{p}'>Frastea redefines that standard through science: <strong>our Rapid Cell-Break Extraction process releases natural tea polyphenols in 5 seconds — zero artificial flavoring, genuine flavor</strong>. It works at any scale, from independent cafes to growing beverage chains.</p>"
+                    f"<p style='{pl}'>I'd love to send a complimentary sample for you to try — no commitment, no pressure. Taste it first, then decide.</p>"
+                    f"<a href='https://wa.me/886903150353' style='{cta}'>Request a Free Sample →</a>"
                     f"{b}{s}{pixel}</div>")
         elif product == "machinery":
-            subject = f"Brewing equipment for {company}, quick question"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>We make commercial brewing machines for cafes and beverage shops that need something reliable and easy to run day-to-day.</p>"
-                    f"<p style='{p}'>If your current setup ever gives you trouble, or you're thinking about expanding, we'd love to show you what we have.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "How much revenue is your brewing equipment quietly costing you each day?"
+            b = banner("machinery", "Featured Equipment",
+                       "Teapresso Two Group Head Machine — commercial high-output brewing machine, ETL / NSF certified, rapid-extract standard built in. Designed for reliable daily operation.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>The day your equipment breaks down, <span style='{ac}'>the cost is never just one cup of tea.</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>It's one of the most consistent things I hear from cafe and beverage shop owners: the moment equipment becomes unreliable, service slows, cup quality varies, complaints go up — and it always seems to happen during peak hours.</p>"
+                    f"<p style='{p}'>Frastea's commercial teapresso machine is built around that reality:</p>"
+                    f"<p style='{p}'>✦ Designed for high-output operations, minimal daily maintenance<br>✦ Rapid-extract standard built in — consistent quality in every cup<br>✦ Taiwan-manufactured, ETL / NSF certified, with a global after-sales service network</p>"
+                    f"<p style='{pl}'>Having more information about Frastea helps you make a better choice.</p>"
+                    f"<a href='https://wa.me/886903150353' style='{cta}'>Learn About Equipment Options →</a>"
                     f"{b}{s}{pixel}</div>")
         else:
-            subject = f"Ingredients & equipment for {company}"
-            body = (f"{HDR}<p style='{p}'>Hi {fname},</p>"
-                    f"<p style='{p}'>This is Elena from Frastea Co. Ltd. from Taiwan.</p>"
-                    f"<p style='{p}'>Frastea and KLUB Technology are sister companies — we handle premium tea &amp; herbal ingredients and the brewing machines to go with them.</p>"
-                    f"<p style='{p}'>If you're sourcing either right now (or just open to exploring), we'd love to connect. Happy to send samples or a quick overview, whichever is more useful.</p>"
-                    f"<p style='{pl}'>We can arrange a short discussion or meeting on how we can support your operation.</p>"
+            subject = "One ingredient supplier, one equipment vendor, two sets of finger-pointing — sound familiar?"
+            b = banner("raw", "Tea &amp; Herbal / Equipment",
+                       "Ingredients: rapid-extract tea &amp; herbal, custom blending, flexible MOQ.&nbsp; Equipment: Teapresso Two Group Head Machine, fully integrated.")
+            body = (f"{HDR}"
+                    f"<p style='{hk}'>One supplier for tea, another for equipment — <span style='{ac}'>and when something goes wrong, nobody takes ownership.</span></p>"
+                    f"<p style='{p}'>Hi {fname},</p>"
+                    f"<p style='{p}'>This is Elena from Frastea, reaching out from Taiwan.</p>"
+                    f"<p style='{p}'>Frastea supplies both <strong>rapid-extract tea &amp; herbal ingredients</strong> and <strong>commercial brewing equipment</strong> — from raw material to finished cup, one partner covers everything. No more coordinating between two separate vendors.</p>"
+                    f"<p style='{p}'>What makes this different is that our ingredients and equipment are built for each other:</p>"
+                    f"<p style='{p}'>✦ Rapid-extract ingredients × rapid-extract machines — parameters fully matched<br>✦ Significantly more consistent flavor, easy for any staff member to operate<br>✦ Free ingredient samples available if you'd like to start there</p>"
+                    f"<p style='{pl}'>If you're currently evaluating suppliers, or simply open to seeing what else is available, I'd love to connect.</p>"
+                    f"<a href='https://wa.me/886963710172' style='{cta}'>Explore Ingredients + Equipment Solutions →</a>"
                     f"{b}{s}{pixel}</div>")
 
     return subject, body, tid, product
