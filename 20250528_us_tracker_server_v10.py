@@ -187,13 +187,17 @@ def send_email(to_addr, subject, html_body, sender, password):
         return False
 
 def find_row(company):
+    leads_db = os.environ.get("LEADS_DB", "/app/output/leads.db")
     try:
-        with open(CSV_FILE, encoding="utf-8-sig") as f:
-            for row in csv.DictReader(f):
-                if row.get("company","").strip().lower() == company.strip().lower():
-                    return row
+        conn = sqlite3.connect(leads_db)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM leads WHERE LOWER(company)=LOWER(?)", (company,))
+        row = cur.fetchone()
+        conn.close()
+        return dict(row) if row else None
     except Exception as e:
-        logging.error(f"CSV read error: {e}")
+        logging.error(f"leads.db read error: {e}")
     return None
 
 def do_send_vip(company, region):
